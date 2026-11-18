@@ -64,6 +64,9 @@ INO_SIZE_OFF = CH_SIZE + 16 + 8   # after key and creat_sqnum
 
 # The official HD4.02 v05.00.00 UPDATE.zip, and the files in it
 UPDATE_SHA256 = "1d88f5dd7a4fdaa6c1664841996efaf68302b2fe0be89d29eb7bec514124ac7e"
+# Official HD4.01 v05.00.00 archive. All three extracted files are byte-identical
+# to HD4.02, but runtime operation on Silver has not been validated.
+SILVER_UPDATE_SHA256 = "e61ef955257ec7aa290170fe9e8f7ba274ffdb07a3d750496782c4e0dd944f79"
 UPDATE_FILES = ("camera_firmware.bin", "camera_loaders.bin", "hd4_update.txt")
 STOCK_SHA256 = "f1be2cce699691cd1cd7754cad51b82fdb0c99c036a913bc11024454ec5e29c1"
 # Result of this script on it: the image flashed and tested by the authors
@@ -261,6 +264,8 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("src", type=pathlib.Path, help="UPDATE.zip, or camera_firmware.bin")
     p.add_argument("dst", type=pathlib.Path, help="directory for UPDATE/ (with a zip), or output file")
+    p.add_argument("--experimental-silver", action="store_true",
+                   help="accept the verified HD4.01 archive; Silver hardware is untested")
     args = p.parse_args()
     src, dst = args.src, args.dst
 
@@ -272,8 +277,15 @@ def main():
         return
 
     digest = hashlib.sha256(src.read_bytes()).hexdigest()
-    if digest != UPDATE_SHA256:
+    if digest == SILVER_UPDATE_SHA256 and not args.experimental_silver:
+        sys.exit("HERO4 Silver archive: hardware support is untested; use --experimental-silver for offline preparation")
+    accepted = {UPDATE_SHA256}
+    if args.experimental_silver:
+        accepted.add(SILVER_UPDATE_SHA256)
+    if digest not in accepted:
         sys.exit(f"{src} is not the official v05.00.00 UPDATE.zip (sha256 {digest}, expected {UPDATE_SHA256})")
+    if digest == SILVER_UPDATE_SHA256:
+        print("EXPERIMENTAL: Silver archive accepted; this does not validate Silver hardware or Linux host compatibility.")
     if not dst.is_dir():
         sys.exit(f"{dst} is not a directory (the SD card, or a folder to copy to it)")
     with zipfile.ZipFile(src) as z:

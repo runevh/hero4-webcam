@@ -1,5 +1,9 @@
 # hero4-webcam
 
+Local investigation: [experimental HERO4 Silver preparation](docs/silver-port.md).
+Official v05.00.00 payloads compared byte-identical, but Silver hardware and
+Raspberry Pi host support remain untested. Do not treat this as a supported port.
+
 Turn a **GoPro HERO4 Black** into a plug-and-play USB webcam, with no HDMI capture card and no app on the computer.
 
 After the patch the camera boots as a standard USB device: **webcam** (1920x1080 or 1280x720 at 29.97 fps, H.264,
