@@ -1,5 +1,9 @@
 # Experimental HERO4 Silver preparation
 
+Follow-up: [diagnostic-only candidate, validation evidence and hardware test
+gates](silver-validation.md). A smaller first-test image is now available locally;
+the original full webcam image below remains untested on Silver.
+
 Status: offline firmware preparation verified; **not hardware-tested**. This is
 not a claim of working Silver webcam support. No experimental update has been
 copied to the user's SD card or flashed.
