@@ -2,9 +2,11 @@
 
 ## Status (2026-11-18)
 
-**Offline checks and standalone Linux RAM boot passed. No firmware flash or
-webcam streaming test has been performed. This is not a safety certification
-or working-Silver webcam claim.**
+**The minimal firmware patch, USB Ethernet and 1080p streaming have passed
+hardware testing on one Silver with a Linux laptop.** Audio playback was also
+enabled and confirmed by the user. See [setup](silver-setup.md) and
+[HD evidence](silver-hd-test.md). UVC/UAC webcam mode and sustained stability
+remain unverified. The staged plan below records the earlier investigation.
 
 The camera was previously identified by its own `MISC/version.txt` as HERO4
 Silver, HD4.01.05.00.00. The user subsequently chose the laptop as the test host;
@@ -44,7 +46,8 @@ flash restoration, stock dual-OS USB takeover, camera encoding or UVC video.
 This standalone SMP kernel differs from the normal non-SMP camera kernel: do
 not load the stock-targeted webcam modules into this diagnostic environment.
 Returning to stock operation requires unplugging USB and reinserting the
-battery, then normal power-on; that post-test reboot is not yet verified.
+battery, then normal power-on. The user subsequently confirmed that normal
+camera operation returned.
 
 ## Diagnostic-only candidate
 
@@ -191,7 +194,27 @@ https://www.tapatalk.com/groups/goprouser/how-to-reflash-firmware-onto-a-bricked
    resolution only after stable video. Stop on freezes, encoder errors or
    thermal/power problems.
 
-Command-mode enumeration and standalone RAM boot are now verified. The stock
-camera diagnostics flash and every webcam-streaming stage remain untested.
+## Diagnostic hardware result (2026-11-18)
+
+The minimal diagnostic image was installed on the Silver. The user confirmed
+that normal preview returned after disconnecting USB. The card contained a
+complete `h4diag.log`, including the expected header and completion marker;
+this confirms execution of the patched SD hook in normal camera firmware.
+The UPDATE directory was absent when the card returned to the laptop.
+
+The snapshot reports Linux 3.8.0 #1 PREEMPT (September 14, 2016), ARMv7,
+the read-only UBIFS root, and initialization of the RTOS `streaming` RPMsg
+channel. USB port status is DEVICE; no UDC class is registered in this
+snapshot. These observations do not establish USB takeover or working video.
+The private raw log is retained outside the repository; its SHA256 is
+`37882dcacdee224e01822d24e30cd3e4deece7c1c7db8d333e18af3edbad653d`.
+Recording/playback and sustained stability still require explicit testing.
+
+Command-mode enumeration, standalone RAM boot, return to normal operation,
+and execution of the minimal diagnostics patch were verified at this stage.
+Subsequent USB Ethernet and 1080p/audio results are recorded in
+[silver-ether-test.md](silver-ether-test.md) and [silver-hd-test.md](silver-hd-test.md).
+The hardware stages above describe the original sequence; the current host
+is the laptop, not a Raspberry Pi. UVC/UAC operation remains untested.
 Firmware/output CRCs cannot certify hardware compatibility, thermal stability
 or recoverability.

@@ -1,12 +1,10 @@
-# Experimental HERO4 Silver preparation
+# HERO4 Silver investigation and firmware comparison
 
-Follow-up: [diagnostic-only candidate, validation evidence and hardware test
-gates](silver-validation.md). A smaller first-test image is now available locally;
-the original full webcam image below remains untested on Silver.
-
-Status: offline firmware preparation verified; **not hardware-tested**. This is
-not a claim of working Silver webcam support. No experimental update has been
-copied to the user's SD card or flashed.
+Current status: **1080p29.97 video and AAC audio over USB Ethernet tested on
+Silver with a Linux laptop**. Use the [Silver setup guide](silver-setup.md).
+The smaller [entry-62 HD patch](silver-hd-test.md) is the tested path.
+The original full webcam image described below remains untested on Silver;
+these offline comparison notes are not its installation instructions.
 
 The official v05.00.00 archives downloaded on 2026-11-18 were:
 
@@ -40,20 +38,15 @@ Verified locally: every input file matches Black; output matches upstream
 global and all section CRCs pass; Silver without the flag and altered ZIPs are
 rejected; the original Black invocation still produces identical output.
 
-## Work remaining before claiming support
+## Remaining scope
 
-- Build or obtain and inspect the runtime modules and `h4.sh`/`h4` payload.
-  The generated UPDATE folder alone is not a complete webcam installation.
-- Validate startup and USB ownership on Silver hardware. Shared firmware can
-  select different behavior based on the detected board; byte identity does
-  not prove that Black's sensor/preview settings work on Silver.
-- Test USB Ethernet first with stock preview modes before enabling the custom
-  high-resolution preset and UVC/audio modules.
-- Test Linux/Raspberry Pi enumeration and H.264 capture; upstream tested macOS
-  only. Verify reconnects, power cycling and sustained streaming.
+- UVC/UAC modules and the upstream full-sensor mode remain untested on Silver.
+- USB Ethernet and H.264 capture passed on Linux. Raspberry Pi operation,
+  repeated power-cycle reliability and extended streaming still need tests.
 - Keep the official Silver update available. Upstream describes restoration
   but has not tested it; USB recovery is experimental, not a guaranteed fallback.
 
 The build-preparation script remains upstream's Black-only path. Since the
 extracted firmware is identical, its Black input can be used for offline builds;
-it must not be interpreted as evidence of tested Silver hardware support.
+it must not be interpreted as evidence that the full Black UVC workflow is
+supported on Silver.

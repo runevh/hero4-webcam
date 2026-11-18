@@ -1,8 +1,10 @@
 # hero4-webcam
 
-Local investigation: [experimental HERO4 Silver preparation](docs/silver-port.md).
-Official v05.00.00 payloads compared byte-identical, but Silver hardware and
-Raspberry Pi host support remain untested. Do not treat this as a supported port.
+**This fork also has a tested HERO4 Silver path:** 1920×1080 H.264 at 29.97 fps
+with the built-in microphone's AAC audio over USB Ethernet, viewed on Linux.
+See the [Silver setup guide](docs/silver-setup.md) and [hardware evidence](docs/silver-hd-test.md).
+Silver UVC/UAC webcam mode, Raspberry Pi operation and long-term stability are
+not yet verified. The original Black webcam workflow below is separate.
 
 Turn a **GoPro HERO4 Black** into a plug-and-play USB webcam, with no HDMI capture card and no app on the computer.
 
@@ -17,7 +19,8 @@ is about 225 ms glass to glass at 1080p and 195 ms at 720p.
 
 ## Requirements
 
-- **GoPro HERO4 Black** (model HD4.02). Not the Silver or the Session: their firmware is different.
+- **GoPro HERO4 Black** (model HD4.02) for the workflow below. For **Silver**
+  (HD4.01), use the separate [Silver guide](docs/silver-setup.md). Session is unsupported.
 - Official firmware **v05.00.00** on the camera. The patch is made from this exact version only.
 - A microSD card (FAT32) and a USB cable.
 - A computer with Python 3.9+. Building from source also needs Docker (for the cross-compiler); tested on macOS
