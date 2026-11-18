@@ -2,13 +2,49 @@
 
 ## Status (2026-11-18)
 
-**Offline checks passed; no camera flash, USB takeover or Pi streaming test has
-been performed. This is not a safety certification or working-Silver claim.**
+**Offline checks and standalone Linux RAM boot passed. No firmware flash or
+webcam streaming test has been performed. This is not a safety certification
+or working-Silver webcam claim.**
 
 The camera was previously identified by its own `MISC/version.txt` as HERO4
-Silver, HD4.01.05.00.00. At this validation session neither the camera, capture
-card nor SD card was visible over USB/block-device inventory. The Pi's model,
-SSH address and credentials have not been provided.
+Silver, HD4.01.05.00.00. The user subsequently chose the laptop as the test host;
+Pi hardware testing is out of the current scope.
+
+## Hardware result: standalone RAM boot
+
+On 2026-11-18 the original USB cable caused descriptor error -71. Replacing
+the cable restored normal GoPro USB enumeration (`2672:000d`). With the battery
+and SD removed, holding Shutter while plugging USB in exposed command mode
+`4255:0009` (Amba A7S).
+
+With explicit user authorization, the locally built `gpboot --h4s-linux` was
+run with upstream's `zImage-h4s`, `initrd-h4s.lzma` and `evilcortex/evilcortex`.
+DDR initialization and its test passed; all uploads completed and gpboot exited
+successfully. No `--h4-recovery` or `--h4-raw` command was executed.
+
+The camera re-enumerated as `0525:a4a2`, RNDIS/Ethernet Gadget, with manufacturer
+`Linux 3.8.0 with ambarella_udc`. After assigning a temporary 10.9.9.2/24 address
+to only the laptop's new USB interface (no default-route/Wi-Fi change), a telnet
+connection to 10.9.9.1 read the following:
+
+```text
+Linux camera 3.8.0 #314 SMP PREEMPT Sat Jul 11 01:10:43 PDT 2015 armv7l GNU/Linux
+mem=500M@0x00500000 root=/dev/ram0 init=/bin/sh console=tty0 initrd=0x07000000,0x00097cf7
+```
+
+The mount list contained only rootfs, proc, tmpfs, sysfs, devpts and debugfs.
+No SD or internal-flash filesystem was mounted; `/proc/mtd` listed no devices.
+There was no `autoreflash` boot parameter. Commands sent over the shell were
+only `echo`, `uname` and `cat` of proc files. Local evidence is saved in ignored
+`build/ram-boot.log` and `build/ram-boot-diagnostics.log`.
+
+This demonstrates command-mode access, standalone Linux RAM execution and a
+working USB network/shell on this Silver. It does not demonstrate successful
+flash restoration, stock dual-OS USB takeover, camera encoding or UVC video.
+This standalone SMP kernel differs from the normal non-SMP camera kernel: do
+not load the stock-targeted webcam modules into this diagnostic environment.
+Returning to stock operation requires unplugging USB and reinserting the
+battery, then normal power-on; that post-test reboot is not yet verified.
 
 ## Diagnostic-only candidate
 
@@ -59,7 +95,9 @@ Reproduce after extracting the official firmware:
 Inspected upstream release v1.3.0, built from commit `e6d150e`.
 ZIP SHA-256, matched against GitHub's release digest:
 `e07c05fb3f892ac17ed03279039155db855449a512cff6878f467ba4594d6674`.
-No downloaded ARM binaries were executed on this host or the camera.
+No webcam-release ARM binaries were executed on this host or the camera.
+The separate recovery project's standalone Linux images were later RAM-booted
+as recorded above.
 
 `scripts/check_runtime.py` checked all nine modules and both userspace programs:
 
@@ -78,7 +116,8 @@ No downloaded ARM binaries were executed on this host or the camera.
 The runtime has **not been rebuilt from source here**: Docker/Podman and the ARM
 cross-compiler are absent. Checks used the checksum-verified upstream build.
 The native recovery tool was compiled separately with local Ubuntu libusb
-headers, without installing system packages or running it against a device.
+headers, without installing system packages. It was later used for the
+authorized RAM boot recorded above.
 
 ## Raspberry Pi host
 
@@ -106,7 +145,7 @@ Inspected `evilwombat/gopro-usb-tools` commit
   HERO4-specific guide documents: remove battery/unplug USB; hold Shutter while
   connecting USB, then release Shutter. This differs from the old-model README
   sequence. For our enumeration-only test remove the SD too; do not prepare a
-  recovery card. The procedure has not been tested on this particular camera.
+  recovery card. This procedure has now been verified on this camera.
 - Standalone Linux leaves the ARM11 spinning and does not run GoPro's normal
   RTOS/encoder/IPC environment. It can establish recovery/USB access but cannot
   validate this webcam runtime or a full normal-camera boot from RAM.
@@ -152,5 +191,7 @@ https://www.tapatalk.com/groups/goprouser/how-to-reflash-firmware-onto-a-bricked
    resolution only after stable video. Stop on freezes, encoder errors or
    thermal/power problems.
 
-No stage beyond offline preparation has been completed. Firmware/output CRCs
-cannot certify hardware compatibility, thermal stability or recoverability.
+Command-mode enumeration and standalone RAM boot are now verified. The stock
+camera diagnostics flash and every webcam-streaming stage remain untested.
+Firmware/output CRCs cannot certify hardware compatibility, thermal stability
+or recoverability.
